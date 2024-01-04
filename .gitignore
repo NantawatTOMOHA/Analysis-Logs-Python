@@ -1,0 +1,6 @@
+
+.venv/
+
+.env
+
+path/cert/http-ca.crt
