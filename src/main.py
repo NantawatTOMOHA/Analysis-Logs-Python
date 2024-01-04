@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 
-load_dotenv('../../.env')
+load_dotenv('../.env')
 URL=os.getenv('URL')
 CA_CERT=os.getenv('CA_CERT')
 API_ID=os.getenv('API_ID')
