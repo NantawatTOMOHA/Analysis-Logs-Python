@@ -21,13 +21,32 @@ class EmailSender:
         self.subject=SUBJECT
 
 
-    def send_email(self, to_email, message):
+    def send_email(self, to_email, description, module_name, hostname, timestamp,severity):
         try: 
+            self.SUBJECT= f"{module_name} Alert - on {hostname}"
+            body = f"""Dear Administrator,
+
+    We hope this message finds you well. We are writing to bring your attention to a recent event in the {module_name} system. Below are the details of the alert:
+
+Module Name: {module_name}
+
+Hostname: {hostname}
+
+Severity: {severity}
+
+Timestamp: {timestamp}
+
+Description:
+{description}
+
+Best regards,
+Kmitl Cyber Security Operation Center"""
+
             em = EmailMessage()
             em['From'] = self.userid
             em['To'] = to_email
-            em['Subject'] = self.subject
-            em.set_content(message)
+            em['Subject'] = self.SUBJECT
+            em.set_content(body)
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp_service:
                 smtp_service.login(self.userid,self.userpass)
