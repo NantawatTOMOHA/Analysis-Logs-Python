@@ -4,6 +4,7 @@ from emailsender import EmailSender
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from multiprocessing import Process, Queue
+import logging
 import queue
 from datetime import datetime
 
@@ -56,7 +57,17 @@ def clear_file(file_path):
         with open(file_path, 'w') as file:
             file.writelines(lines_to_keep)
     
-
+def Create_alert_Index(index_name_alert,data):
+    try:
+        if not client.indices.exists(index=index_name_alert):
+            client.indices.create(index=index_name_alert)
+            print(f"Index created: {index_name_alert}")
+        else: 
+            client.index(index=index_name_alert,body=data)
+            print(f"Push new event into : {index_name_alert}")
+            
+    except Exception as e :
+        print(f"Failed to create index: {e}")
 
 
 def Analyze( data_queue):
@@ -64,6 +75,7 @@ def Analyze( data_queue):
             if client.ping():
                     current_date = datetime.now().strftime("%Y.%m.%d")
                     index_name = f"switch-{current_date}"
+                    index_name_alert = f"alert-switch-{current_date}"
                     search_query = {
                         "query": {
                             "match_all": {}
@@ -89,13 +101,19 @@ def Analyze( data_queue):
                     'severity':  source['severity'],
                     'description': source['description']
                 }
-                if int(entry['severity']) <= 3 :
+                if int(entry['severity']) <= 2 :
                     # email alert
                     temp_timestamp=str(entry['@timestamp'])
+                    
                     if not temp_timestamp in read_timestamp_from_file('./timestamps.txt'):
                         data_queue.put(entry)
+                        Create_alert_Index(index_name_alert,entry)
                         write_timestamp_to_file(temp_timestamp, './timestamps.txt')
                         clear_file('./timestamps.txt')
+                        
+                        
+
+
 
 
 def SendToEmail(data_queue):
@@ -104,8 +122,7 @@ def SendToEmail(data_queue):
         try:
             data = data_queue.get(timeout=1)
             EmailSend = EmailSender(USERID,USERPASS)
-            EmailSend.send_email(to_email, str(data['description']), str(data['module_name']) , str(data['hostname']) , str(data['@timestamp']),severity_level_map[int(data['severity'])])
-            
+            EmailSend.send_email(to_email, str(data['description']), str(data['module_name']) , str(data['hostname']) , str(data['@timestamp']),severity_level_map[int(data['severity'])])            
         except queue.Empty:
             pass
 
