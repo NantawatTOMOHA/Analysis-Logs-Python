@@ -1,10 +1,8 @@
 import os
-import smtplib
 from emailsender import EmailSender
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from multiprocessing import Process, Queue
-import logging
 import queue
 from datetime import datetime
 
