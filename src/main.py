@@ -6,7 +6,6 @@ from multiprocessing import Process, Queue
 import queue
 from datetime import datetime
 
-
 load_dotenv('../.env')
 URL=os.getenv('URL')
 CA_CERT=os.getenv('CA_CERT')
@@ -28,7 +27,6 @@ severity_level_map = {
     2: "Critical (Critical condition)",
 }
 
-
 def write_timestamp_to_file(timestamp, file_path):
     with open(file_path, 'a') as file:
         file.write(timestamp + '\n')
@@ -44,8 +42,7 @@ def clear_file(file_path):
 
     current_date = datetime.now().date()
     file_last_modified = datetime.fromtimestamp(os.path.getmtime(file_path)).date()
-    # print(file_last_modified)
-    # print(current_date)
+
     if current_date > file_last_modified:
         with open(file_path, 'r') as file:
             lines = file.readlines()
@@ -109,11 +106,6 @@ def Analyze( data_queue):
                         write_timestamp_to_file(temp_timestamp, './timestamps.txt')
                         clear_file('./timestamps.txt')
                         
-                        
-
-
-
-
 def SendToEmail(data_queue):
     to_email = ['63010584@kmitl.ac.th', '63010629@kmitl.ac.th', "63010519@kmitl.ac.th"]
     while True:
