@@ -1,3 +1,6 @@
+import os
+from datetime import datetime, timedelta
+
 class FileHandler:
     # cache module_name and description -> check duplicate send email 
     def write_to_cache(self, description, hostname, file_path):
@@ -24,10 +27,10 @@ class FileHandler:
             return []
 
     # clear data file 
-    def clear_file(file_path, condition):
+    def clear_file(self,file_path, condition):
         current_date = datetime.now().date()
         file_last_modified = datetime.fromtimestamp(os.path.getmtime(file_path)).date()
-
+        lines_to_keep = []
         if current_date > file_last_modified:
             with open(file_path, 'r') as file:
                 lines = file.readlines()

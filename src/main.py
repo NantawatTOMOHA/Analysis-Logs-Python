@@ -1,6 +1,7 @@
 import os
 import queue
 import sys
+import time
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from multiprocessing import Process, Queue
@@ -98,8 +99,7 @@ def Analyze(data_queue):
                                 data_queue.put(entry)
                                 print("sent to alert log Dashboard:", index_name_alert)
                                 Create_alert_Index(index_name_alert, entry)
-                                file_handler.write_to_cache(entry['description'], entry['hostname'],
-                                                            "../cache/email_cache.txt")
+                                file_handler.write_to_cache(entry['description'], entry['hostname'],"../cache/email_cache.txt")
                                 file_handler.write_timestamp_to_file(temp_timestamp, '../cache/timestamps.txt')
                                 file_handler.clear_file('../cache/timestamps.txt', False)
 
@@ -111,7 +111,7 @@ def SendToEmail(data_queue):
     while True:
         try:
             to_email = []
-            with open("/home/Email_management-Python/cache/list_email.txt", 'r') as file:
+            with open("/home/Email_management-Python/src/list_email.txt", 'r') as file:
                 for line in file:
                     stripped_line = line.strip()
                     if stripped_line:
