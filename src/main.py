@@ -1,7 +1,9 @@
 import os
 import queue
+import re
 import sys
 import time
+import schedule 
 from dotenv import load_dotenv
 from elasticsearch import Elasticsearch
 from multiprocessing import Process, Queue
@@ -94,14 +96,12 @@ def Analyze(data_queue):
                         entry_tuple = (entry['description'], entry['hostname'])
                         if entry_tuple not in cache:
                             temp_timestamp = str(entry['@timestamp'])
-                            file_handler.clear_file('../cache/email_cache.txt', True)
                             if temp_timestamp not in file_handler.read_timestamp_from_file('../cache/timestamps.txt'):
                                 data_queue.put(entry)
                                 print("sent to alert log Dashboard:", index_name_alert)
                                 Create_alert_Index(index_name_alert, entry)
                                 file_handler.write_to_cache(entry['description'], entry['hostname'],"../cache/email_cache.txt")
                                 file_handler.write_timestamp_to_file(temp_timestamp, '../cache/timestamps.txt')
-                                file_handler.clear_file('../cache/timestamps.txt', False)
 
             except Exception as e:
                 print(f"Error during search: {e}")
@@ -122,14 +122,27 @@ def SendToEmail(data_queue):
         except queue.Empty:
             pass
 
+# clear file every 07:00 am
+def clear_files_job():
+    file_handler.clear_file('../cache/email_cache.txt', True)
+    file_handler.clear_file('../cache/timestamps.txt', False)
+
+def schedule_job():
+    schedule.every().day.at("07:00").do(clear_files_job)
+
+    while True: 
+        schedule.run_pending()
+        time.sleep(1)
 # Main
 if __name__ == "__main__":
 
     data_queue = Queue()
 
+    schedule_process = Process(target=schedule_job)
     Analyze_process = Process(target=Analyze, args=(data_queue,))
     Email_process = Process(target=SendToEmail, args=(data_queue,))
 
+    schedule_process.start()
     Analyze_process.start()
     Email_process.start()
 

@@ -28,14 +28,11 @@ class FileHandler:
 
     # clear data file 
     def clear_file(self,file_path, condition):
-        current_date = datetime.now().date()
-        file_last_modified = datetime.fromtimestamp(os.path.getmtime(file_path)).date()
         lines_to_keep = []
-        if current_date > file_last_modified:
-            with open(file_path, 'r') as file:
-                lines = file.readlines()
-            if condition is False:
-                lines_to_keep = lines[-50:]
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+        if condition == False:
+            lines_to_keep = lines[-50:]
 
-            with open(file_path, 'w') as file:
-                file.writelines(lines_to_keep)
+        with open(file_path, 'w') as file:
+            file.writelines(lines_to_keep)
