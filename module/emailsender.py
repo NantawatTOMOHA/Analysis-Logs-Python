@@ -5,23 +5,18 @@ from dotenv import load_dotenv
 
 import ssl
 load_dotenv("../.env")
-SUBJECT=os.getenv("SUBJECT")
+
 
 class EmailSender:
-    def __init__(self,USERID,USERPASS,SUBJECT):
-        self.userid= USERID
-        self.userpass=USERPASS
-        self.subject=SUBJECT
 
     def __init__(self,USERID,USERPASS):
         self.userid= USERID
         self.userpass=USERPASS
-        self.subject=SUBJECT
-
+        self.subject=""
 
     def send_email(self, to_email, description, module_name, hostname, timestamp,severity):
         try: 
-            self.SUBJECT= f"{module_name} Alert - on {hostname}"
+            self.subject= f"{module_name} Alert - on {hostname}"
             body = f"""Dear Administrator,
 
     We hope this message finds you well. We are writing to bring your attention to a recent event in the {module_name} system. Below are the details of the alert:
@@ -43,7 +38,7 @@ Kmitl Cyber Security Operation Center"""
             em = EmailMessage()
             em['From'] = self.userid
             em['To'] = to_email
-            em['Subject'] = self.SUBJECT
+            em['Subject'] = self.subject
             em.set_content(body)
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL('smtp.gmail.com',465,context=context) as smtp_service:
