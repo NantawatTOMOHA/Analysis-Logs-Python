@@ -21,7 +21,6 @@ URL = os.getenv('URL')
 CA_CERT = os.getenv('CA_CERT')
 API_ID = os.getenv('API_ID')
 API_KEY = os.getenv('API_KEY')
-API_INDEXNAME = os.getenv('API_INDEXNAME')
 USERID = os.getenv("USERID")
 USERPASS = os.getenv("USERPASS")
 
